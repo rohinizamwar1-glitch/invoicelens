@@ -1,0 +1,26 @@
+{% extends "base.html" %}{% block title %}Check an invoice{% endblock %}
+{% block content %}
+<p class="eyebrow">ACCOUNTS PAYABLE</p>
+<h1>Check an invoice before it is paid</h1>
+<p class="lead">Paste the text of a supplier invoice. InvoiceLens reads the details, checks them against vendors, purchase orders and budgets, and recommends approve, review or reject, with the reasons.</p>
+<div class="flow" aria-label="How it works"><span>Paste invoice</span><i>→</i><span>Hide account numbers</span><i>→</i><span>Extract details (AI + rules)</span><i>→</i><span>23 risk checks</span><i>→</i><span>Saved to database</span><i>→</i><span>Decision + approver</span></div>
+{% if errors %}<div class="error-message" role="alert">Please fix the following:<ul>{% for e in errors %}<li>{{ e }}</li>{% endfor %}</ul></div>{% endif %}
+<form method="post" action="{{ url_for('submit') }}" class="card stack">
+  <div class="grid2">
+    <div><label for="submitted_by">Submitted by</label><input id="submitted_by" name="submitted_by" value="{{ form.submitted_by }}" maxlength="80" placeholder="e.g. Asha (Marketing)" required></div>
+    <div><label for="department">Department that pays</label>
+      <select id="department" name="department" required><option value="">Choose…</option>
+        {% for d in departments %}<option {{ 'selected' if form.department == d }}>{{ d }}</option>{% endfor %}</select></div>
+    <div><label for="po_hint">PO number <span class="muted">(optional)</span></label><input id="po_hint" name="po_hint" value="{{ form.po_hint or '' }}" placeholder="Only if it is not on the invoice"><p class="hint">Used only when the invoice itself shows no PO.</p></div>
+  </div>
+  <div><label for="invoice_text">Invoice text</label>
+    <textarea id="invoice_text" name="invoice_text" required placeholder="Paste the invoice text here…">{{ form.invoice_text }}</textarea>
+    <p class="hint">Bank account numbers are masked to the last 4 digits before anything is stored or sent to the AI.</p></div>
+  <div class="inline"><button class="button button-primary" type="submit">Check invoice</button>
+    <span class="muted small">{% if llm.key %}AI extraction on ({{ llm.model }}), with rule-based backup.{% else %}AI key not set: using rule-based extraction.{% endif %}</span></div>
+</form>
+<section class="card">
+  <h2>Try a sample</h2><p class="muted small">Each one is built to trigger a different outcome.</p>
+  <div class="chips">{% for s in samples %}<a class="chip {{ 'on' if picked == s.id }}" href="{{ url_for('index', sample=s.id) }}">{{ s.label }}</a>{% endfor %}</div>
+</section>
+{% endblock %}

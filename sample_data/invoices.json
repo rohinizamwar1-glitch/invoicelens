@@ -1,0 +1,74 @@
+[
+ {
+  "id": "clean",
+  "label": "Clean invoice, matches PO",
+  "department": "Operations",
+  "submitted_by": "Imran (Operations)",
+  "expect": "Approve",
+  "text": "ORBIT LOGISTICS PVT LTD\nSurvey 88, Whitefield, Bengaluru, Karnataka 560066\nGSTIN: 29AACCO8821Q1ZO\n\nTAX INVOICE\nInvoice No: OL-8790\nInvoice Date: 20 Sep 2026\nDue Date: 20 Oct 2026\nPO Number: PO-1050\n\nBill To:\nGlowkind Pvt Ltd, Andheri East, Mumbai 400093\nGSTIN: 27AAECG7742R1ZU\n\nDescription: Surface freight Sept 2026, Mumbai-Pune lanes\n\nSubtotal:  ₹50,000.00\nIGST @18%:  ₹9,000.00\nTotal Payable:  ₹59,000.00\n\nBank: Axis Bank A/c 62200144897730  IFSC UTIB0000456"
+ },
+ {
+  "id": "duplicate",
+  "label": "Already-submitted invoice sent again",
+  "department": "Marketing",
+  "submitted_by": "Asha (Marketing)",
+  "expect": "Reject",
+  "text": "KIRAN PRINT & PACK PVT LTD\nPlot 14, MIDC Industrial Area, Bhiwandi, Maharashtra 421302\nGSTIN: 27AABCK4417M1ZD\n\nTAX INVOICE\nInvoice No: KPP/2026/0412\nInvoice Date: 12 Oct 2026\nDue Date: 11 Nov 2026\nPO No: PO-1042\n\nBill To:\nGlowkind Pvt Ltd, Andheri East, Mumbai 400093\nGSTIN: 27AAECG7742R1ZU\n\nDescription: Mono-carton boxes for serum 30ml, qty 5000 @ 20.00\n\nSubtotal:  ₹1,00,000.00\nCGST @9%:  ₹9,000.00\nSGST @9%:  ₹9,000.00\nTotal Amount Payable:  ₹1,18,000.00\n\nBank: HDFC Bank A/c 50100234564821  IFSC HDFC0001234"
+ },
+ {
+  "id": "bank",
+  "label": "Bank details changed",
+  "department": "Operations",
+  "submitted_by": "Imran (Operations)",
+  "expect": "Needs review",
+  "text": "ORBIT LOGISTICS PVT LTD\nSurvey 88, Whitefield, Bengaluru, Karnataka 560066\nGSTIN: 29AACCO8821Q1ZO\n\nTAX INVOICE\nInvoice No: OL-8841\nInvoice Date: 14 Oct 2026\nDue Date: 13 Nov 2026\nPO Number: PO-1050\n\nBill To:\nGlowkind Pvt Ltd, Andheri East, Mumbai 400093\nGSTIN: 27AAECG7742R1ZU\n\nDescription: Surface freight Sept-Oct 2026, Mumbai-Delhi lanes\n\nSubtotal:  ₹2,00,000.00\nIGST @18%:  ₹36,000.00\nTotal Payable:  ₹2,36,000.00\n\nPlease note our NEW bank details:\nAxis Bank A/c 91702200159915  IFSC UTIB0000456"
+ },
+ {
+  "id": "math",
+  "label": "Total does not add up",
+  "department": "Marketing",
+  "submitted_by": "Asha (Marketing)",
+  "expect": "Needs review",
+  "text": "LOTUS CREATIVE STUDIO\n12 Linking Road, Bandra West, Mumbai 400050\nGSTIN: 27AAFFL2190B1ZN\n\nTAX INVOICE\nInvoice No: LCS-219\nInvoice Date: 09 Oct 2026\nDue Date: 08 Nov 2026\nPO No: PO-1066\n\nBill To:\nGlowkind Pvt Ltd, Andheri East, Mumbai 400093\nGSTIN: 27AAECG7742R1ZU\n\nDescription: Festive campaign creatives and photoshoot\n\nSubtotal:  ₹1,80,000.00\nGST @18%:  ₹32,400.00\nGrand Total:  ₹2,22,400.00\n\nBank: ICICI Bank A/c 60011273441156  IFSC ICIC0000600"
+ },
+ {
+  "id": "overpo",
+  "label": "Bill is more than the PO",
+  "department": "Technology",
+  "submitted_by": "Neha (Technology)",
+  "expect": "Needs review",
+  "text": "NIMBUS CLOUD SERVICES PVT LTD\nTower B, Hinjewadi Phase 2, Pune 411057\nGSTIN: 29AAGCN5530D1ZK\n\nTAX INVOICE\nInvoice No: NCS-5530\nInvoice Date: 10 Oct 2026\nDue Date: 09 Nov 2026\nPO No: PO-1061\n\nBill To:\nGlowkind Pvt Ltd, Andheri East, Mumbai 400093\nGSTIN: 27AAECG7742R1ZU\n\nDescription: Cloud hosting Oct 2026 incl. extra storage tier\n\nSubtotal:  ₹2,00,000.00\nIGST @18%:  ₹36,000.00\nTotal Amount Payable:  ₹2,36,000.00\n\nBank: SBI A/c 30998811229042  IFSC SBIN0004321"
+ },
+ {
+  "id": "small",
+  "label": "Small routine bill",
+  "department": "Admin",
+  "submitted_by": "Farah (Admin)",
+  "expect": "Approve",
+  "text": "VEGA OFFICE SUPPLIES\nShop 3, Lamington Road, Mumbai 400007\nGSTIN: 27AAJFV3391P1ZB\n\nTAX INVOICE\nInvoice No: VOS-3391\nInvoice Date: 15 Oct 2026\nDue Date: 30 Oct 2026\n\nBill To:\nGlowkind Pvt Ltd, Andheri East, Mumbai 400093\nGSTIN: 27AAECG7742R1ZU\n\nDescription: Stationery and printer paper, monthly refill\n\nSubtotal:  ₹7,000.00\nCGST @9%:  ₹630.00\nSGST @9%:  ₹630.00\nTotal Amount Payable:  ₹8,260.00\n\nBank: Axis A/c 91400033183318  IFSC UTIB0000112"
+ },
+ {
+  "id": "newvendor",
+  "label": "New vendor, no PO, bad GSTIN",
+  "department": "Marketing",
+  "submitted_by": "Asha (Marketing)",
+  "expect": "Reject",
+  "text": "ZENITH EVENT WORKS LLP\nUnit 5, Sakinaka, Mumbai 400072\nGSTIN: 27AAKFZ9012E1ZX\n\nTAX INVOICE\nInvoice No: ZEW-07\nInvoice Date: 16 Oct 2026\nDue Date: 15 Oct 2026\n\nBill To:\nGlowkind Pvt Ltd, Andheri East, Mumbai 400093\nGSTIN: 27AAECG7742R1ZU\n\nDescription: Diwali launch event, venue, stage and crew\n\nSubtotal:  ₹4,00,000.00\nGST @18%:  ₹72,000.00\nTotal Amount Payable:  ₹4,72,000.00\n\nBank: Kotak A/c 7712309988142  IFSC KKBK0000761"
+ },
+ {
+  "id": "blocked",
+  "label": "Blocked vendor",
+  "department": "Admin",
+  "submitted_by": "Farah (Admin)",
+  "expect": "Reject",
+  "text": "SHREE GANESH TRADERS\nGala 9, Vashi APMC, Navi Mumbai 400703\nGSTIN: 27AAHFS6604K1ZW\n\nTAX INVOICE\nInvoice No: SGT-118\nInvoice Date: 11 Oct 2026\nDue Date: 10 Nov 2026\n\nBill To:\nGlowkind Pvt Ltd, Andheri East, Mumbai 400093\nGSTIN: 27AAECG7742R1ZU\n\nDescription: Bulk gift hampers\n\nSubtotal:  ₹50,000.00\nGST @18%:  ₹9,000.00\nTotal Amount Payable:  ₹59,000.00\n\nBank: Bank of Baroda A/c 29340100066604  IFSC BARB0VASHIX"
+ },
+ {
+  "id": "messy",
+  "label": "Messy forwarded message",
+  "department": "Operations",
+  "submitted_by": "Imran (Operations)",
+  "expect": "Needs review",
+  "text": "Hi team, attached is the courier bill for last week's sample shipments. Roughly 4500 + gst I think. Pls clear asap, vendor is calling every day. Thanks, Ramesh"
+ }
+]

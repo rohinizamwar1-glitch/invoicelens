@@ -1,0 +1,26 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}InvoiceLens{% endblock %} · InvoiceLens</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='invoice.css') }}">
+</head>
+<body>
+  <header class="topbar">
+    <a class="brand" href="{{ url_for('index') }}" aria-label="InvoiceLens home"><span class="brand-mark">I</span><span>Invoice<span class="brand-light">Lens</span></span></a>
+    <nav class="nav">
+      <a href="{{ url_for('index') }}" class="{{ 'active' if request.endpoint == 'index' }}">Check an invoice</a>
+      <a href="{{ url_for('invoices') }}" class="{{ 'active' if request.endpoint in ('invoices','invoice') }}">All invoices</a>
+      <a href="{{ url_for('admin') }}" class="{{ 'active' if request.endpoint in ('admin','admin_login') }}">Dashboard</a>
+      {% if is_admin %}<a href="{{ url_for('admin_master') }}" class="{{ 'active' if request.endpoint == 'admin_master' }}">Master data</a>
+      <form method="post" action="{{ url_for('admin_logout') }}" style="display:inline"><button type="submit">Sign out</button></form>{% endif %}
+    </nav>
+  </header>
+  <main class="page">
+    {% with messages = get_flashed_messages() %}{% for m in messages %}<div class="flash" role="status">{{ m }}</div>{% endfor %}{% endwith %}
+    {% block content %}{% endblock %}
+    <footer class="page-footer"><span>InvoiceLens · invoice checks before payment</span><span>The AI reads the invoice. Rules decide the risk.</span></footer>
+  </main>
+</body>
+</html>
