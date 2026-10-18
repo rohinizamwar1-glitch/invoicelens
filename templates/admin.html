@@ -1,0 +1,48 @@
+{% extends "base.html" %}{% block title %}Dashboard{% endblock %}
+{% macro bar(label, n, total, cls='') %}<div class="bar-row"><span>{{ label }}</span><div class="bar"><i class="{{ cls }}" style="width:{{ (n*100/total)|round if total else 0 }}%"></i></div><b>{{ n }}</b></div>{% endmacro %}
+{% block content %}
+<div class="inline" style="justify-content:space-between"><div><p class="eyebrow">ADMIN</p><h1>Approvals dashboard</h1></div>
+  <form method="post" action="{{ url_for('seed_demo') }}"><button class="button button-small">Add demo history</button></form></div>
+<p class="lead">What is waiting for a human, what the system handled by itself, and how the AI and rules are performing.</p>
+<div class="stats">
+  <div class="stat"><b>{{ s.total }}</b><span>Invoices checked</span></div>
+  <div class="stat"><b>{{ s.pending }}</b><span>Waiting for approval · {{ s.value_pending|inr }}</span></div>
+  <div class="stat"><b>{{ s.auto }}</b><span>Handled automatically</span></div>
+  <div class="stat"><b>{{ s.rejected }}</b><span>Rejected · {{ s.value_blocked|inr }} stopped</span></div>
+  <div class="stat"><b>{{ s.overridden }}</b><span>Human overrides</span></div>
+  <div class="stat"><b>{{ s.avg_confidence }}%</b><span>Avg extraction confidence</span></div>
+</div>
+
+<section class="card"><h2>Approval queue ({{ queue|length }})</h2>
+<p class="muted small">Oldest decisions first need attention. Going against the recommendation requires a note and is logged as an override.</p>
+{% if queue %}<div class="scroll"><table><thead><tr><th>#</th><th>Vendor</th><th class="num">Total</th><th>Risk</th><th>Recommendation</th><th>Approver</th><th>Decide</th></tr></thead><tbody>
+{% for r in queue|sort(attribute='id') %}<tr>
+ <td><a href="{{ url_for('invoice', invoice_id=r.id) }}">#{{ r.id }}</a></td><td>{{ r.vendor_name or '— unreadable —' }}<br><span class="muted small">{{ r.invoice_number or '' }} · {{ r.department }}</span></td>
+ <td class="num">{{ r.total|inr }}</td><td><span class="pill pill-{{ r.risk_level|lower }}">{{ r.risk_level }} · {{ r.risk_score }}</span></td>
+ <td><span class="pill pill-{{ 'review' if r.decision == 'Needs review' else r.decision|lower }}">{{ r.decision }}</span></td><td>{{ r.approver }}</td>
+ <td><form method="post" action="{{ url_for('invoice_action', invoice_id=r.id) }}" class="inline">
+   <input type="hidden" name="next" value="{{ url_for('admin') }}"><input type="hidden" name="reviewer" value="Admin">
+   <input name="note" placeholder="Note" maxlength="500" aria-label="Note for invoice {{ r.id }}" style="min-width:110px">
+   <button class="button button-good button-small" name="action" value="approve">Approve</button><button class="button button-bad button-small" name="action" value="reject">Reject</button></form></td></tr>{% endfor %}
+</tbody></table></div>{% else %}<div class="clean-state">Queue is clear.</div>{% endif %}
+</section>
+
+<div class="two">
+<section class="card"><h2>Recommendations</h2>
+  {% for d, cls in (('Approve','good'),('Needs review','warn'),('Reject','bad')) %}{{ bar(d, s.by_decision.get(d,0), s.total, cls) }}{% endfor %}
+  <h3 style="margin-top:1rem">Risk levels</h3>
+  {% for l, cls in (('Low','good'),('Medium','warn'),('High','warn'),('Critical','bad')) %}{{ bar(l, s.by_level.get(l,0), s.total, cls) }}{% endfor %}
+  <p class="muted small">Review from {{ review }} points, reject from {{ reject }}. Auto-approve up to {{ limit|inr }} when nothing is flagged.</p>
+</section>
+<section class="card"><h2>Most frequent flags</h2>
+  {% for t in s.top_rules %}{{ bar(t.title, t.count, s.total) }}{% else %}<p class="muted">No flags yet.</p>{% endfor %}
+  <h3 style="margin-top:1rem">AI usage</h3>
+  <div class="facts small"><div><span>Read by AI</span><b>{{ s.ai_used }} of {{ s.total }}</b></div><div><span>AI failures (rules took over)</span><b>{{ s.ai_failed }}</b></div>
+   <div><span>Tokens used</span><b>{{ '{:,}'.format(s.tokens) }}</b></div><div><span>Avg AI latency</span><b>{{ s.avg_latency }} ms</b></div></div>
+</section>
+</div>
+
+<section class="card"><h2>Spend by department</h2><div class="scroll"><table><thead><tr><th>Department</th><th class="num">Invoices</th><th class="num">Not rejected</th><th class="num">Monthly budget</th></tr></thead><tbody>
+{% for d in s.by_department %}<tr><td>{{ d.department }}</td><td class="num">{{ d.n }}</td><td class="num">{{ d.spend|inr }}</td><td class="num">{{ d.budget|inr }}</td></tr>{% else %}<tr><td colspan="4" class="muted">No data yet.</td></tr>{% endfor %}
+</tbody></table></div></section>
+{% endblock %}

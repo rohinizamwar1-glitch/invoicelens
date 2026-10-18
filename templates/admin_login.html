@@ -1,0 +1,13 @@
+{% extends "base.html" %}{% block title %}Admin sign-in{% endblock %}
+{% block content %}
+<section class="card narrow">
+  <p class="eyebrow">ADMIN</p><h1>Sign in to the dashboard</h1>
+  {% if not configured %}
+    <div class="error-message">Admin is locked: set <code>ADMIN_PASSWORD</code> in Replit Secrets and restart the app.</div>
+  {% else %}
+    {% if error %}<div class="error-message" role="alert">{{ error }}</div>{% endif %}
+    <form method="post" class="stack"><div><label for="password">Password</label><input id="password" name="password" type="password" required autofocus></div>
+    <button class="button button-primary" type="submit">Sign in</button></form>
+  {% endif %}
+</section>
+{% endblock %}

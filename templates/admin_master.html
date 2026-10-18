@@ -1,0 +1,20 @@
+{% extends "base.html" %}{% block title %}Master data{% endblock %}
+{% block content %}
+<p class="eyebrow">ADMIN</p><h1>Master data and rules</h1>
+<p class="lead">The records every invoice is checked against. Blocking a vendor here takes effect on the next invoice.</p>
+<section class="card"><h2>Vendors</h2><div class="scroll"><table><thead><tr><th>Name</th><th>GSTIN</th><th>Bank (last 4)</th><th>Status</th><th></th></tr></thead><tbody>
+{% for v in vendors %}<tr><td>{{ v.name }}</td><td><code>{{ v.gstin or '—' }}</code></td><td>{{ v.bank_last4 or '—' }}</td><td><span class="pill pill-{{ v.status }}">{{ v.status|capitalize }}</span></td>
+<td><form method="post" action="{{ url_for('toggle_vendor', vendor_id=v.id) }}"><button class="button button-small">{{ 'Unblock' if v.status == 'blocked' else 'Block' }}</button></form></td></tr>{% endfor %}
+</tbody></table></div>
+<form method="post" action="{{ url_for('add_vendor') }}" class="inline" style="margin-top:1rem">
+  <input name="name" placeholder="Vendor name" required maxlength="120"><input name="gstin" placeholder="GSTIN (optional)" maxlength="15"><input name="bank_last4" placeholder="Bank last 4" maxlength="4" style="max-width:120px">
+  <button class="button button-primary button-small">Add vendor</button></form></section>
+<div class="two">
+<section class="card"><h2>Purchase orders</h2><table><thead><tr><th>PO</th><th>Vendor</th><th class="num">Value</th><th class="num">Invoiced</th></tr></thead><tbody>
+{% for p in pos %}<tr><td>{{ p.po_number }}</td><td>{{ p.vendor_name }}</td><td class="num">{{ p.amount|inr }}</td><td class="num">{{ p.invoiced|inr }}</td></tr>{% endfor %}</tbody></table></section>
+<section class="card"><h2>Department budgets (monthly)</h2><table><tbody>{% for d in depts %}<tr><td>{{ d.name }}</td><td class="num">{{ d.monthly_budget|inr }}</td></tr>{% endfor %}</tbody></table>
+<h3 style="margin-top:1rem">Approval tiers</h3><table><tbody>{% for limit, name in tiers %}<tr><td>{{ ('Up to ' ~ (limit|inr)) if limit else 'Above that' }}</td><td>{{ name }}</td></tr>{% endfor %}</tbody></table></section>
+</div>
+<section class="card"><h2>Risk rule catalogue</h2><p class="muted small">Points: {% for k, v in points.items() %}{{ k }} {{ v }}{{ ', ' if not loop.last }}{% endfor %}.</p>
+<div class="scroll"><table><thead><tr><th>Rule</th><th>Name</th><th>Severity</th></tr></thead><tbody>{% for rid, (title, sev) in rules.items() %}<tr><td><code>{{ rid }}</code></td><td>{{ title }}</td><td><span class="pill pill-{{ sev }}">{{ sev|capitalize }}</span></td></tr>{% endfor %}</tbody></table></div></section>
+{% endblock %}
