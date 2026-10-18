@@ -1,0 +1,70 @@
+{% extends "base.html" %}{% block title %}Invoice #{{ i.id }}{% endblock %}
+{% set dkey = 'review' if i.decision == 'Needs review' else i.decision|lower %}
+{% block content %}
+<p class="eyebrow">DECISION REPORT · INVOICE #{{ i.id }}</p>
+<section class="card verdict">
+  <div class="ring r-{{ i.risk_level|lower }}" style="--p:{{ i.risk_score }}"><div><div><b>{{ i.risk_score }}</b><br><small>RISK / 100</small></div></div></div>
+  <div class="verdict-box v-{{ dkey }}">
+    <span class="pill pill-{{ dkey }}">{{ i.decision|upper }}</span> <span class="pill pill-{{ i.risk_level|lower }}">{{ i.risk_level }} risk</span>
+    <h1>{{ f.vendor_name or 'Vendor not found' }} · {{ i.total|inr }}</h1>
+    <p class="big-note">{{ r.note }}</p>
+    <div class="next">Next step: {{ r.next_action }}</div>
+  </div>
+  <div class="facts">
+    <div><span>Status</span><span class="pill pill-{{ i.status }}">{{ i.status|capitalize }}</span></div>
+    <div><span>Approver</span><b>{{ i.approver or 'Not applicable' }}</b></div>
+    <div><span>Department</span><b>{{ i.department }}</b></div>
+    <div><span>Submitted by</span><b>{{ i.submitted_by }}</b></div>
+    {% if i.decided_by %}<div><span>Decided by</span><b>{{ i.decided_by }}</b></div>{% endif %}
+    {% if i.overridden %}<div><span>Override</span><span class="pill pill-high">Against recommendation</span></div>{% endif %}
+  </div>
+</section>
+{% if i.reviewer_note %}<div class="flash"><b>Reviewer note:</b> {{ i.reviewer_note }}</div>{% endif %}
+
+<div class="two">
+<section class="card">
+  <h2>Extracted details</h2>
+  <p class="muted small">{{ x.description or 'Fields read from the pasted invoice.' }} · Extraction confidence {{ i.extraction_confidence }}%</p>
+  <table><tbody>
+  {% for key, label in labels.items() %}{% set v = f[key] %}<tr><td class="muted">{{ label }}</td>
+   <td>{% if v is none %}<span class="pill pill-hit">Not found</span>
+       {% elif key in ('subtotal','tax','total') %}{{ v|inr }}
+       {% elif key in ('invoice_date','due_date') %}{{ v|dmy }}
+       {% else %}{{ v }}{% endif %}</td>
+   <td><span class="pill pill-src">{{ {'ai':'AI','rules':'Rules','assumed':'Assumed','user':'You'}.get(x.sources.get(key), '') }}</span></td></tr>{% endfor %}
+  </tbody></table>
+  {% if x.ungrounded %}<p class="small" style="color:var(--warn)">Discarded because they were not written in the invoice: {{ x.ungrounded|join(', ') }}.</p>{% endif %}
+</section>
+
+<section class="card">
+  <h2>Risk flags ({{ r.hits|length }})</h2>
+  <p class="muted small">{{ r.passed }} of {{ r.checks|length }} checks passed. Score = sum of flag points, capped at 100.</p>
+  {% for h in r.hits %}
+    <div class="hit sev-{{ h.severity }}"><div class="hit-top"><span>{{ h.title }}</span><span class="pill pill-{{ h.severity }}">{{ h.severity|capitalize }} · +{{ h.points }}</span></div>
+      <p>{{ h.detail }}</p><p class="act">→ {{ h.action }}</p>
+      {% if h.forces %}<p class="small muted">This flag alone forces: {{ h.forces }}.</p>{% endif %}</div>
+  {% else %}<div class="clean-state">No flags raised. Every check passed or did not apply.</div>{% endfor %}
+  <details><summary>All {{ r.checks|length }} checks</summary>
+    <table><tbody>{% for c in r.checks %}<tr><td>{{ c.title }}</td><td><span class="pill pill-{{ c.status }}">{{ {'pass':'Passed','hit':'Flagged','skip':'Skipped'}[c.status] }}</span></td><td class="muted small">{{ c.why if c.status == 'skip' }}</td></tr>{% endfor %}</tbody></table></details>
+</section>
+</div>
+
+{% if is_admin and i.status == 'pending' %}
+<section class="card"><h2>Your decision</h2>
+  <form method="post" action="{{ url_for('invoice_action', invoice_id=i.id) }}" class="stack">
+    <div class="grid2"><div><label for="reviewer">Your name</label><input id="reviewer" name="reviewer" value="Admin"></div>
+    <div><label for="note">Note <span class="muted">(required if you go against the recommendation)</span></label><input id="note" name="note" maxlength="500"></div></div>
+    <div class="inline"><button class="button button-good" name="action" value="approve">Approve</button><button class="button button-bad" name="action" value="reject">Reject</button></div>
+  </form></section>
+{% endif %}
+
+<section class="card"><h2>How this was processed</h2>
+  <div class="grid2 small">
+    <div><span class="muted">Extraction method</span><br><b>{{ 'AI + rules' if i.extraction_method == 'ai' else 'Rules only' }}</b></div>
+    <div><span class="muted">AI status</span><br><b>{{ {'used':'Used','failed':'Failed, rules took over','unavailable':'No API key','disabled':'Off'}.get(i.ai_status, i.ai_status) }}</b>{% if i.ai_error %}<br><span class="muted">{{ i.ai_error }}</span>{% endif %}</div>
+    <div><span class="muted">Model</span><br><b>{{ i.model or '—' }}</b></div>
+    <div><span class="muted">AI latency / tokens</span><br><b>{% if i.latency_ms %}{{ i.latency_ms }} ms · {{ (i.tokens_in or 0) + (i.tokens_out or 0) }}{% else %}—{% endif %}</b></div>
+  </div>
+  <details><summary>Invoice text as stored (account numbers masked)</summary><pre style="white-space:pre-wrap;font-size:.8rem;background:#f4f5fa;padding:.8rem;border-radius:8px">{{ i.source_text }}</pre></details>
+</section>
+{% endblock %}

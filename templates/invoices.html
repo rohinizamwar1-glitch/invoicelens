@@ -1,0 +1,23 @@
+{% extends "base.html" %}{% block title %}All invoices{% endblock %}
+{% block content %}
+<p class="eyebrow">HISTORY</p><h1>All invoices</h1>
+<p class="lead">Every invoice checked so far, newest first.</p>
+<div class="chips" style="margin-bottom:1rem">
+  <a class="chip {{ 'on' if not status and not decision }}" href="{{ url_for('invoices') }}">All</a>
+  <a class="chip {{ 'on' if status=='pending' }}" href="{{ url_for('invoices', status='pending') }}">Waiting for approval</a>
+  <a class="chip {{ 'on' if status=='approved' }}" href="{{ url_for('invoices', status='approved') }}">Approved</a>
+  <a class="chip {{ 'on' if status=='rejected' }}" href="{{ url_for('invoices', status='rejected') }}">Rejected</a>
+</div>
+<section class="card scroll">
+{% if rows %}
+<table><thead><tr><th>#</th><th>Vendor</th><th>Invoice</th><th class="num">Total</th><th>Dept</th><th>Risk</th><th>Recommendation</th><th>Status</th><th>Checked</th></tr></thead><tbody>
+{% for r in rows %}<tr>
+ <td><a href="{{ url_for('invoice', invoice_id=r.id) }}">#{{ r.id }}</a></td>
+ <td>{{ r.vendor_name or '—' }}</td><td>{{ r.invoice_number or '—' }}</td><td class="num">{{ r.total|inr }}</td><td>{{ r.department }}</td>
+ <td><span class="pill pill-{{ r.risk_level|lower }}">{{ r.risk_level }} · {{ r.risk_score }}</span></td>
+ <td><span class="pill pill-{{ 'review' if r.decision == 'Needs review' else r.decision|lower }}">{{ r.decision }}</span></td>
+ <td><span class="pill pill-{{ r.status }}">{{ r.status|capitalize }}</span></td><td class="muted small">{{ r.created_at|when }}</td></tr>{% endfor %}
+</tbody></table>
+{% else %}<p class="muted">Nothing here yet. <a href="{{ url_for('index') }}">Check the first invoice.</a></p>{% endif %}
+</section>
+{% endblock %}
